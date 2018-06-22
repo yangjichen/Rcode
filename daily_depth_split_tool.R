@@ -66,15 +66,27 @@ depth_split = function(time_inter = 60){
         if (num_interval>1) {
           time_indicator = time_indicator+time_inter
           #避免indicator更新后还是比当前时间点时间小的Bug，也就是这里验证会不会跳过一分钟
-          if (time_indicator < Exchange$timestamp[j]){
+          if (time_indicator > Exchange$timestamp[j]){ next }  else{
+            
             bid = append(bid, Exchange$bidp_1[j-1])
             ask = append(ask, Exchange$askp_1[j-1])
             lasttime = append(lasttime, Exchange$timestamp[j-1]+starttime)
             num_interval = num_interval - 1
             
-            if (num_interval>1) {
-              time_indicator = time_indicator+time_inter
-              next} 
+            for(k in 1:10){
+              if (time_indicator+60*k <= Exchange$timestamp[j]){
+                bid = append(bid, Exchange$bidp_1[j-1])
+                ask = append(ask, Exchange$askp_1[j-1])
+                lasttime = append(lasttime, Exchange$timestamp[j-1]+starttime)
+                num_interval = num_interval - 1
+                
+                } else{
+
+                  time_indicator = time_indicator + 60*k
+                  break
+              }
+                
+            }
 
           
           
@@ -86,11 +98,12 @@ depth_split = function(time_inter = 60){
     
       }
     }
-    
+    #print(length(bid))    
     if (length(bid)!=1440){
       print(paste('please check',i))
       next
     }
+
     split_matrix = cbind(split_matrix,lasttime,bid,ask)
     
     split_matrix = split_matrix[,-1]
