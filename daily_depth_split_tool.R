@@ -99,6 +99,7 @@ depth_split = function(time_inter = 60){
       }
     }
     #print(length(bid))    
+    
     if (length(bid)!=1440){
       print(paste('please check',i))
       next
